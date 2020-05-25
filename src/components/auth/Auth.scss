@@ -1,0 +1,63 @@
+.__auth-container {
+    margin: 7% auto auto auto;
+    background-color: white;
+    width: 472px !important;
+    border: solid 1px #eaeced;
+    border-radius: 6px;
+    padding: 40px !important;
+    height: 460px;
+  
+    > .logo {
+      display: inline-block;
+  
+      > img {
+        width: 30px;
+        height: 45px;
+      }
+    }
+  
+    .container-title {
+        display: inline-block;
+        font-size: 25px;
+        font-weight: 600;
+        line-height: 45px;
+        vertical-align: bottom;
+        //   margin-bottom: -0.1vw;
+    }
+  
+    button {
+      background-color: #4585f5;
+      border-radius: 3.4px;
+      height: 49px;
+      padding: 10px 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      outline: transparent;
+  
+      &.on {
+        color: white;
+        box-shadow: 0 2px 3px 0 rgba(174, 199, 242, 0.62);
+        border: solid 0 #eaeced;
+      }
+  
+      &.off {
+        background-color: #f7f7f7;
+        color: #5c5c5c;
+        border: solid 0;
+      }
+    }
+}
+
+.form-register {
+    margin-top: 37px;
+}
+  
+.form-register-submit {
+    margin-top: 18px;
+}
+
+.btn:disabled {
+    cursor: default;
+    opacity: 0.3 !important;
+    filter: alpha(opacity=30);
+}

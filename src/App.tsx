@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import Auth from './Auth/Auth';
+// import Auth from './Auth/Auth';
+import Auth from './components/auth/Auth';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.css';
 
