@@ -1,0 +1,40 @@
+@font-face {
+  font-family: "Cerebri Sans";
+  src: url(./assets/fonts/CerebriSans-Medium.ttf);
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cerebri Sans";
+  src: url(./assets/fonts/CerebriSans-Regular.ttf);
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cerebri Sans";
+  src: url(./assets/fonts/CerebriSans-Bold.ttf);
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cerebri Sans";
+  src: url(./assets/fonts/CerebriSans-SemiBold.ttf);
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Cerebri Sans";
+  src: url(./assets/fonts/CerebriSans-Book.ttf);
+  font-weight: 300;
+  font-style: normal;
+}
+
+/* Alberto: Since now, all elements in this page
+will have CircularStd as default font. */
+* {
+  font-family: 'Cerebri Sans', sans-serif;
+}
