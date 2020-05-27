@@ -1,0 +1,17 @@
+.form-register {
+    margin-top: 37px;
+}
+  
+.form-register-submit {
+    margin-top: 18px;
+}
+
+.btn:disabled {
+    cursor: default;
+    opacity: 0.3 !important;
+    filter: alpha(opacity=30);
+}
+
+.btn-primary.dropdown-toggle:focus {
+  box-shadow: 0 0 0 0.2rem transparent !important;
+}

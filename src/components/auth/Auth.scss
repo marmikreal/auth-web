@@ -1,5 +1,22 @@
+.__auth-main-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  &> .__auth-container-sections > div:nth-child(2) {
+    color: #a4a4a4;
+    font-size: 0.9vw;
+    margin-top: 4%;
+    align-self: flex-end;
+    
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
 .__auth-container {
-    margin: 7% auto auto auto;
     background-color: white;
     width: 472px !important;
     border: solid 1px #eaeced;
@@ -46,18 +63,32 @@
         border: solid 0;
       }
     }
+
+    .form-control {
+      height: 49px;
+    }
+
+    * button:disabled {
+      opacity: 0.5;
+    }
+}
+
+.menu-box {
+  margin-bottom: 21px;
+  margin-top: 20px;
+  padding: 0;
 }
 
 .form-register {
-    margin-top: 37px;
+  margin-top: 37px;
 }
   
 .form-register-submit {
-    margin-top: 18px;
+  margin-top: 18px;
 }
 
 .btn:disabled {
-    cursor: default;
-    opacity: 0.3 !important;
-    filter: alpha(opacity=30);
+  cursor: default;
+  opacity: 0.3 !important;
+  filter: alpha(opacity=30);
 }
