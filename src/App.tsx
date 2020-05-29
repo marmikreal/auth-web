@@ -35,13 +35,11 @@ class App extends React.Component<Props, State> {
   render() {
     return(
       <Container fluid className="__auth-main-container">
-        <div className="__auth-container-sections .animated .fadeInLeft">
-          <Router history={history}>
-            <Switch>
-
-                <div className="__auth-container">
-                  <Route exact path='/'><Redirect to='/signin' /></Route>
-
+        <div className="__auth-container-sections .animated .fadeInLeft">  
+          <div className="__auth-container">
+            
+            <Router history={history}>
+              <Switch>    
                   <Route exact path='/signin' render={props =>
                     <Auth internalForm={<SignIn />}
                   />} />
@@ -51,11 +49,13 @@ class App extends React.Component<Props, State> {
                   />} />
 
                   <Route exact path='/recovery' render={props => <Recovery />} />
-                  <Route><Redirect to='/signin' /></Route>
-                </div>
 
-            </Switch>
-          </Router>
+                  <Route exact path='/'><Redirect to='/signin' /></Route>
+                  <Route path="*"><Redirect to='/signin' /></Route>
+                  
+              </Switch>
+            </Router>
+          </div>
 
           <div className={this.state.showRecoveryStep} onClick={(e: any) => {
             e.preventDefault();
