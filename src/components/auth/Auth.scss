@@ -6,7 +6,7 @@
 
   &> .__auth-container-sections > div:nth-child(2) {
     color: #a4a4a4;
-    font-size: 0.9vw;
+    font-size: 13px;
     margin-top: 4%;
     align-self: flex-end;
     
@@ -39,11 +39,13 @@
         font-weight: 600;
         line-height: 45px;
         vertical-align: bottom;
+        margin-bottom: 0.2rem;
         //   margin-bottom: -0.1vw;
     }
   
     button {
-      background-color: #4585f5;
+      /* background-color: #4585f5; */
+      /* background-color: black; */
       border-radius: 3.4px;
       height: 49px;
       padding: 10px 20px;
@@ -53,7 +55,7 @@
   
       &.on {
         color: white;
-        box-shadow: 0 2px 3px 0 rgba(174, 199, 242, 0.62);
+        box-shadow: 0 2px 3px 0 rgba(34, 39, 48, 0.62);
         border: solid 0 #eaeced;
       }
   
@@ -84,11 +86,21 @@
 }
   
 .form-register-submit {
-  margin-top: 18px;
+  margin-top: 21px !important;
 }
 
 .btn:disabled {
   cursor: default;
   opacity: 0.3 !important;
   filter: alpha(opacity=30);
+}
+
+button:focus {
+  outline: none !important;
+}
+
+.form-control:focus {
+  border-color: black !important;
+  /* box-shadow: 0 2px 3px 0 rgba(34, 39, 48, 0.62) !important; */
+  box-shadow: none !important;
 }

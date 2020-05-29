@@ -1,13 +1,13 @@
-var events: object = (function () {
-    var topics: any = {};
-    var hOP: any = topics.hasOwnProperty;
+var events = (function () {
+    var topics = {};
+    var hOP = topics.hasOwnProperty;
     
     return {
-        subscribe: function (topic: string, listener: object) {
+        subscribe: function (topic, listener) {
             if (!hOP.call(topics, topic))
                 topics[topic] = [];
 
-            var index: any = topics[topic].push(listener) - 1;
+            var index = topics[topic].push(listener) - 1;
 
             return {
                 remove: function () {
@@ -15,15 +15,15 @@ var events: object = (function () {
                 }
             };
         },
-        publish: function (topic: string, info: object) {
+        publish: function (topic, info) {
             if (!hOP.call(topics, topic))
                 return;
 
-            topics[topic].forEach(function (item: any) {
+            topics[topic].forEach(function (item) {
                 item(info != undefined ? info : {});
             });
         }
     };
 })();
 
-export { events };
+export default events;
