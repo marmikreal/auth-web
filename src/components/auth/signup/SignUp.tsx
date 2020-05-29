@@ -145,7 +145,7 @@ class SignUp extends React.Component<Props, State> {
         return(
             <div>
                 <p className="container-title">Activation Email</p>
-                <p className="privacy-disclaimer">Please check your email and follow the instructions to activate your account so you can start using Internxt services.</p>
+                <p className="privacy-disclaimer">Please check your email and follow the instructions to activate your account so you can start using Internxt.</p>
                 <ul className="privacy-remainders" style={{ paddingTop: '20px' }}>By creating an account, you are agreeing to our Terms &amp; Conditions and Privacy Policy</ul>
                 <Button variant="dark" className="btn-block on" onClick={() => {
                     

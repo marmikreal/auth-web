@@ -20,11 +20,10 @@
 .__auth-container {
     background-color: white;
     width: 472px !important;
-    /* border: solid 1px #eaeced; */
     border-radius: 16px;
     padding: 40px !important;
     height: 460px;
-    box-shadow: 0 12px 18px 2px rgba(34,0,51,.04), 0 6px 22px 4px rgba(7,48,114,.12), 0 6px 10px -4px rgba(14,13,26,.12);
+    box-shadow: 0 12px 18px 2px rgba(34,0,51,.04), 0 -6px 22px 4px rgba(7,48,114,.12), 0 6px 10px -4px rgba(14,13,26,.12);
   
     > .logo {
       display: inline-block;
@@ -44,7 +43,6 @@
         margin-bottom: 0.2rem;
         color: #414154 !important;
         text-align: center;
-        //   margin-bottom: -0.1vw;
     }
   
     button {
@@ -53,7 +51,6 @@
       
       border-radius: 3.4px;
       height: 49px;
-      /* padding: 10px 20px; */
       cursor: pointer;
       outline: transparent;
   
@@ -108,6 +105,29 @@ button:focus {
 
 .form-control:focus {
   border-color: #414154 !important;
-  /* box-shadow: 0 2px 3px 0 rgba(34, 39, 48, 0.62) !important; */
   box-shadow: none !important;
+}
+
+@media only screen and (max-width: 426px) {
+  .__auth-main-container {
+
+    &> .__auth-container-sections {
+      width: 100%;
+    }
+  
+    &> .__auth-container-sections > div:nth-child(2) {
+      width: 50%;
+      margin-left: 39px !important;
+      align-self: flex-end;
+      display: flex;
+      align-items: left;
+      justify-content: left;
+    }
+  }
+
+  .__auth-container {
+    width: 100% !important;
+    box-shadow: none !important;
+
+  }
 }
