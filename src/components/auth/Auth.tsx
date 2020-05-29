@@ -1,7 +1,4 @@
 import React from 'react';
-import { Container, Button } from 'react-bootstrap';
-import SignUp from './signup/SignUp';
-import history from './../../lib/history';
 import './Auth.scss';
 
 interface Props {

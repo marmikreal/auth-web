@@ -1,7 +1,8 @@
 import React from 'react';
-import { Form, Col, Button } from 'react-bootstrap';
+import { Form, Col, Button, Image } from 'react-bootstrap';
 import history from './../../../lib/history';
 import './SignUp.scss';
+import logo from './../../../assets/img/inxt-logo-black.svg';
 
 interface Props {}
 interface State {
@@ -9,6 +10,7 @@ interface State {
     lastName: string,
     email: string
     container: JSX.Element
+    isValid: Boolean
 }
 
 class SignUp extends React.Component<Props, State> {
@@ -19,22 +21,40 @@ class SignUp extends React.Component<Props, State> {
             firstName: '',
             lastName: '',
             email: '',
-            container: this.renderSignUpContainer()
+            container: this.renderSignUpContainer(),
+            isValid: false
         };
+    }
+
+    handleFirstNameChange(e: any) {
+        this.setState({ firstName: e.target.value });
+    }
+
+    handleLastNameChange(e: any) {
+        this.setState({ lastName: e.target.value });
+    }
+
+    handleEmailChange(e: any) {
+        this.setState({ email: e.target.value });
     }
 
     renderHeaderButtons(): JSX.Element {
         return(
             <div>
-                <p className="container-title">Create an Internxt account</p>
+                <p className="container-title">
+                    <Image
+                        src={logo}
+                        height={50}
+                        width={150} />
+                </p>
 
                 <div className="menu-box">
-                    <Button variant="dark" className='off' onClick={(e: any) => {
+                    <Button variant="dark" className='off __signin-btn' onClick={(e: any) => {
                         e.preventDefault();
                         history.push('/signin');
                     }}>Sign in</Button>
 
-                    <Button variant="dark" className='on' onClick={(e: any) => {
+                    <Button variant="dark" className='on __signup-btn' onClick={(e: any) => {
                         e.preventDefault();
                         history.push('/signup');
                     }}>Create account</Button>
@@ -43,7 +63,7 @@ class SignUp extends React.Component<Props, State> {
         );
     }
 
-    renderPrivacyContainer(): JSX.Element {
+    renderPrivacyContainer(): JSX.Element {   
         return(
             <div>
                 <p className="container-title">Internxt Security</p>
@@ -134,34 +154,48 @@ class SignUp extends React.Component<Props, State> {
         );
     }
 
+    isValidForm(): Boolean {
+        let isValid = true;
+        console.log('validating...');
+
+        if (!this.state) return false;
+
+        if (this.state.firstName === '' || this.state.lastName === '') {
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
     renderSignUpContainer(): JSX.Element {
+        const isValid = this.isValidForm();
         return(
             <div>
                 {this.renderHeaderButtons()}
                 
                 <Form className="form-register" onSubmit={(e: any) => {
                     e.preventDefault();
+
+                    this.setState({
+                        container: this.renderPrivacyContainer()
+                    });
                 }}>
                     <Form.Row>
-                        <Form.Group as={Col} controlId="name">
-                            <Form.Control placeholder="First name" required autoComplete="name" onChange={() => {}} value={''} autoFocus />
+                        <Form.Group as={Col} controlId="firstName">
+                            <Form.Control placeholder="First name" required autoComplete="firstname" value={this.state && this.state.firstName} onChange={this.handleFirstNameChange.bind(this)} autoFocus />
                         </Form.Group>
-                        <Form.Group as={Col} controlId="lastname">
-                            <Form.Control placeholder="Last name" required autoComplete="lastname" onChange={() => {}} value={''} />
+                        <Form.Group as={Col} controlId="lastName">
+                            <Form.Control placeholder="Last name" required autoComplete="lastname" value={this.state && this.state.lastName} onChange={this.handleLastNameChange.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="email">
-                            <Form.Control placeholder="Email address" type="email" required autoComplete="email" onChange={() => {}} value={''} />
+                            <Form.Control placeholder="Email address" type="email" required autoComplete="email" value={this.state && this.state.email} onChange={this.handleEmailChange.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row className="form-register-submit">
                         <Form.Group as={Col}>
-                            <Button variant="dark" className="on btn-block" type="submit" onClick={() => {
-                                this.setState({
-                                    container: this.renderPrivacyContainer()
-                                });
-                            }}>Continue</Button>
+                            <Button variant="dark" className="on btn-block" disabled={false} type="submit">Continue</Button>
                         </Form.Group>
                     </Form.Row>
                 </Form>
@@ -170,11 +204,7 @@ class SignUp extends React.Component<Props, State> {
     }
 
     render(): JSX.Element {
-        return(
-            <div>
-                {this.state.container}
-            </div>
-        );
+        return this.state.container;
     }
 }
 
