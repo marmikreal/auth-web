@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import events from '../../lib/pubsub';
 import validator from '../../lib/validator';
 import history from '../../lib/history';
-import './SignIn.scss';
+import './Login.scss';
 import logo from '../../assets/img/inxt-logo-black.svg';
 import { getHeaders } from '../../lib/auth';
 import 'react-toastify/dist/ReactToastify.css';
@@ -29,7 +29,7 @@ interface LoginState {
     isTeam: Boolean
 }
 
-class SignIn extends React.Component<LoginProps, LoginState> {
+class Login extends React.Component<LoginProps, LoginState> {
     constructor(props: LoginProps) {
         super(props);
 
@@ -57,18 +57,26 @@ class SignIn extends React.Component<LoginProps, LoginState> {
       // Check if recent login is passed and redirect user to Internxt Drive
       const mnemonic = localStorage.getItem('xMnemonic');
       const user = JSON.parse(localStorage.getItem('xUser') || '{}');
+      //const xKeys = localStorage.getItem('xKeys');
     
-      if (user && mnemonic && this.props.handleKeySaved) {
+      if (user && mnemonic && /*xkeys*/  this.props.handleKeySaved) {
         this.props.handleKeySaved(user)
-        history.push('/app')
+        //history.push('/app')
+        /******************************************
+        FLOW WILL BE REDIRECTED TO THE REFERER APP
+        ******************************************/
       }
     }
 
     componentDidUpdate() {
         if (this.state.isAuthenticated && this.state.token && this.state.user) {
           const mnemonic = localStorage.getItem('xMnemonic');
+          //const xKeys = localStorage.getItem('xKeys');
           if (mnemonic) {
-            history.push('/app')
+            //history.push('/app')
+            /******************************************
+            FLOW WILL BE REDIRECTED TO THE REFERER APP
+            ******************************************/
           }
         }
     }
@@ -162,31 +170,48 @@ class SignIn extends React.Component<LoginProps, LoginState> {
     }
 
     doLogin = () => {
-        // Proceed with submit
-        fetch("/api/login", {
-          method: "post",
-          headers: getHeaders(true, false),
-          body: JSON.stringify({ email: this.state.email })
-        }).then(response => {
-          if (response.status === 200) {
-            // Manage credentials verification
-            response.json().then((body) => {
-              // Check password
-              const salt = decryptText(body.sKey);
-              const hashObj = passToHash({ password: this.state.password, salt });
-              const encPass = encryptText(hashObj.hash);
+      /*
+      //Generate keys
+      const { privateKeyArmored, publicKeyArmored, revocationCertificate } = await openpgp.generateKey({
+      userIds: [{ email: 'inxt@inxt.com' }], // you can pass multiple user IDs
+      curve: 'ed25519',                                           // ECC curve name       // protects the private key
+      });
+
+      const encPrivateKey = AesUtil.encrypt(privateKeyArmored, this.state.password, false)
+      const codpublicKey = Buffer.from(publicKeyArmored).toString('base64');
+      const codrevocateKey = Buffer.from(revocationCertificate).toString('base64');
+      const decKrey = AesUtil.decrypt(encPrivateKey,this.state.password);
+      */
+
+      // Proceed with submit
+      fetch("/api/login", {
+        method: "post",
+        headers: getHeaders(true, false),
+        body: JSON.stringify({ email: this.state.email })
+      }).then(response => {
+        if (response.status === 200) {
+          // Manage credentials verification
+          response.json().then((body) => {
+            // Check password
+            const salt = decryptText(body.sKey);
+            const hashObj = passToHash({ password: this.state.password, salt });
+            const encPass = encryptText(hashObj.hash);
     
-              fetch("/api/access", {
-                method: "post",
-                headers: getHeaders(true, false),
-                body: JSON.stringify({
-                  email: this.state.email,
-                  password: encPass,
-                  tfa: this.state.twoFactorCode
-                })
-              }).then(async res => {
-                return { res, data: await res.json() };
-              }).then(res => {/*
+            fetch("/api/access", {
+              method: "post",
+              headers: getHeaders(true, false),
+              body: JSON.stringify({
+                email: this.state.email,
+                password: encPass,
+                tfa: this.state.twoFactorCode
+                //publicKey:codpublicKey,
+                //privateKey:encPrivateKey,
+                //revocationKey:codrevocateKey,
+                //privateKeyDec: decKrey
+              })
+            }).then(async res => {
+              return { res, data: await res.json() };
+            }).then(res => {/*
                 console.log("ACCESS RESPONSE: ", res.data); //debug
                 if (res.res.status !== 200) {
                   throw new Error(res.data.error ? res.data.error : res.data);
@@ -224,6 +249,7 @@ class SignIn extends React.Component<LoginProps, LoginState> {
                 localStorage.setItem('xToken', data.token);
                 localStorage.setItem('xMnemonic', user.mnemonic);
                 localStorage.setItem('xUser', JSON.stringify(user));
+                localStorage.setItem('xKeys', decKrey);
     
                 this.setState({
                   isAuthenticated: true,
@@ -255,7 +281,7 @@ class SignIn extends React.Component<LoginProps, LoginState> {
             console.error("Login error. " + err)
             toast.warn('Login error')
           });
-      }
+    }
 
     render(): JSX.Element {
         return(
@@ -306,4 +332,4 @@ class SignIn extends React.Component<LoginProps, LoginState> {
     }
 }
 
-export default SignIn;
+export default Login;

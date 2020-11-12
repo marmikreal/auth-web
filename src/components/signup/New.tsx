@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Form, Col, Button, Image } from 'react-bootstrap';
 import { isMobile, isAndroid, isIOS } from 'react-device-detect';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import './SignUp.scss';
+import './New.scss';
 import history from '../../lib/history';
 import logo from '../../assets/img/inxt-logo-black.svg';
 import { getHeaders } from '../../lib/auth';
@@ -25,11 +26,11 @@ interface State {
     user?: any
 }
 
-class SignUp extends React.Component<Props, State> {
+class New extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        let isEmailParam = this.props.match && this.isValidEmail(this.props.match.params.email);
+        let isEmailParam = this.props.match.params.email && this.isValidEmail(this.props.match.params.email);
 
         this.state = {
             container: isEmailParam ? this.renderConfirmActivationContainer() : this.renderSignUpContainer(),
@@ -63,7 +64,7 @@ class SignUp extends React.Component<Props, State> {
         }
     }
 
-    
+
 
     handleChangeRegister = (event: any) => {
         var registerState = this.state.register;
@@ -80,8 +81,8 @@ class SignUp extends React.Component<Props, State> {
         let emailPattern = /^((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*"))@((?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))$/;
         return emailPattern.test(email.toLowerCase());
     }
-    
-    
+
+
     isValidPassword(password: string) {
         let passwordPattern = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
         return passwordPattern.test(password);
@@ -112,6 +113,20 @@ class SignUp extends React.Component<Props, State> {
         const mnemonic = bip39.generateMnemonic(256);
         const encMnemonic = encryptTextWithKey(mnemonic, this.state.register.password);
 
+        /*
+         //Generate keys
+        const {privateKeyArmored, publicKeyArmored, revocationCertificate} = await openpgp.generateKey({
+            userIds: [{  email: 'inxt@inxt.com' }], // you can pass multiple user IDs
+            curve: 'ed25519',                                           // ECC curve name        // protects the private key
+        });
+        
+        const encPrivateKey = AesUtil.encrypt(privateKeyArmored,this.state.register.password,false);
+        const decKrey = AesUtil.decrypt(encPrivateKey,this.state.register.password);
+        const codpublicKey = Buffer.from(publicKeyArmored).toString('base64');
+        const decpublicKey = Buffer.from(codpublicKey).toString();
+        const codrevocateKey = Buffer.from(revocationCertificate).toString('base64');
+        */
+
         fetch("/api/register", {
             method: "post",
             headers: getHeaders(true, true),
@@ -123,11 +138,14 @@ class SignUp extends React.Component<Props, State> {
                 mnemonic: encMnemonic,
                 salt: encSalt,
                 referral: this.readReferalCookie()
+                /*privateKey: encPrivateKey,
+                publicKey: codpublicKey,
+                revocationKey: codrevocateKey*/
             })
-        }).then(response => {/*   
-            ******************************************
+        }).then(response => {  
+            /******************************************
             FLOW WILL BE REDIRECTED TO THE REFERER APP
-            ******************************************
+            ******************************************/
             if (response.status === 200) {
                 response.json().then((body) => {
                     // Manage succesfull register
@@ -157,7 +175,7 @@ class SignUp extends React.Component<Props, State> {
                     toast.warn(`"${message}"`);
                     this.setState({ validated: false });
                 })
-            }*/
+            }
         }).catch(err => {
             console.error("Register error", err);
         });
@@ -168,7 +186,7 @@ class SignUp extends React.Component<Props, State> {
 
 
     renderHeaderButtons(): JSX.Element {
-        return(
+        return (
             <div>
                 <p className="container-title">
                     <Image
@@ -192,8 +210,8 @@ class SignUp extends React.Component<Props, State> {
         );
     }
 
-    renderPrivacyContainer(): JSX.Element {   
-        return(
+    renderPrivacyContainer(): JSX.Element {
+        return (
             <div>
                 <p className="container-title">Internxt Security</p>
                 <p className="privacy-disclaimer">Due to the secure nature of Internxt, we do not store your password. That means that if you ever forget it, you will not be able to access your account. With us, you're the only owner of your data. We strongly suggest you to:</p>
@@ -201,7 +219,7 @@ class SignUp extends React.Component<Props, State> {
                     <li>Store your Password. Keep it safe and secure.</li>
                     <li>Keep an offline backup of your password.</li>
                 </ul>
-                
+
                 <Form onSubmit={(e: any) => {
                     e.preventDefault();
                 }}>
@@ -229,22 +247,22 @@ class SignUp extends React.Component<Props, State> {
     }
 
     renderConfirmPasswordContainer(): JSX.Element {
-        return(
+        return (
             <div>
-               {this.renderHeaderButtons()}
-            
+                {this.renderHeaderButtons()}
+
                 <Form className="form-register" onSubmit={(e: any) => {
                     e.preventDefault();
                 }}>
                     <Form.Row>
                         <Form.Control type="hidden" name="username" autoComplete="username" value={''} />
                         <Form.Group as={Col} controlId="password">
-                            <Form.Control type="password" required placeholder="Password" autoComplete="new-password" onChange={() => {}} autoFocus />
+                            <Form.Control type="password" required placeholder="Password" autoComplete="new-password" onChange={() => { }} autoFocus />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="confirmPassword">
-                            <Form.Control type="password" required placeholder="Confirm password" autoComplete="confirm-password" onChange={() => {}} />
+                            <Form.Control type="password" required placeholder="Confirm password" autoComplete="confirm-password" onChange={() => { }} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row className="form-register-submit">
@@ -258,26 +276,26 @@ class SignUp extends React.Component<Props, State> {
                         </Form.Group>
                         <Form.Group as={Col}>
                             <Button variant="dark" className="btn-block on" type="submit" onClick={() => {
-                                 this.setState({
+                                this.setState({
                                     container: this.renderConfirmActivationContainer()
                                 });
                             }}>Continue</Button>
                         </Form.Group>
                     </Form.Row>
                 </Form>
-            
+
             </div>
         );
     }
 
     renderConfirmActivationContainer(): JSX.Element {
-        return(
+        return (
             <div>
                 <p className="container-title">Activation Email</p>
                 <p className="privacy-disclaimer">Please check your email and follow the instructions to activate your account so you can start using Internxt.</p>
                 <ul className="privacy-remainders" style={{ paddingTop: '20px' }}>By creating an account, you are agreeing to our Terms &amp; Conditions and Privacy Policy</ul>
                 <Button variant="dark" className="btn-block on" onClick={() => {
-                    
+
                 }}>Re-send activation email</Button>
             </div>
         );
@@ -285,10 +303,10 @@ class SignUp extends React.Component<Props, State> {
 
     renderSignUpContainer(): JSX.Element {
         //const isValid = this.validateRegisterForm();
-        return(
+        return (
             <div>
                 {this.renderHeaderButtons()}
-                
+
                 <Form className="form-register" onSubmit={(e: any) => {
                     e.preventDefault();
 
@@ -324,4 +342,4 @@ class SignUp extends React.Component<Props, State> {
     }
 }
 
-export default SignUp;
+export default New;

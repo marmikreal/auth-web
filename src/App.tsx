@@ -3,9 +3,10 @@ import { Switch, Route, Router, Redirect } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import events from './lib/pubsub';
 import Auth from './components/Auth';
-import SignIn from './components/signin/SignIn';
-import SignUp from './components/signup/SignUp';
-import Recovery from './components/recovery/Recovery';
+import Login from './components/signin/Login';
+import New from './components/signup/New';
+import Deactivation from './components/deactivation/Deactivation';
+import Activation from './components/activation/Activation';
 import history from './lib/history';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -43,14 +44,16 @@ class App extends React.Component<Props, State> {
             <Router history={history}>
               <Switch>    
                   <Route exact path='/login' render={props =>
-                    <Auth internalForm={<SignIn isAuthenticated={this.state.isAuthenticated} />}
+                    <Auth internalForm={<Login {...props} isAuthenticated={this.state.isAuthenticated} />}
                   />} />
                   
                   <Route exact path='/new' render={props =>
-                    <Auth internalForm={<SignUp />}
+                    <Auth internalForm={<New {...props} />}
                   />} />
 
-                  <Route exact path='/recovery' render={props => <Recovery />} />
+                  <Route exact path='/deactivation' render={props => <Deactivation {...props} />} />
+
+                  <Route exact path='/activate/:email' render={props => <Activation {...props} />} />
 
                   <Route exact path='/'><Redirect to='/login' /></Route>
                   <Route path="*"><Redirect to='/login' /></Route>
@@ -61,7 +64,7 @@ class App extends React.Component<Props, State> {
 
           <div className={this.state.showRecoveryStep} onClick={(e: any) => {
             e.preventDefault();
-            history.push('/recovery');
+            history.push('/deactivation');
           }}>Forgot your password?</div>
 
         </div>

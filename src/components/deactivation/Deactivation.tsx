@@ -1,29 +1,86 @@
 import React from 'react';
 import { Container, Form, Col, Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import axios from 'axios';
+import { isMobile } from 'react-device-detect'
 import history from '../../lib/history';
-import './Recovery.scss';
+import './Deactivation.scss';
 
-interface Props {}
+interface Props { 
+    match?: any
+}
 interface State {
     container: JSX.Element
+    token: string
+    result: JSX.Element
+    errorReason: string
 }
 
-class Recovery extends React.Component<Props, State> {
+class Deactivation extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
         this.state = {
-            container: this.renderRecoveryContainer()
+            container: this.renderRecoveryContainer(),
+            token: this.props.match.params.token,
+            result: this.renderConfirmDeactivation(),
+            errorReason: ''
         };
     }
 
+    componentDidUpdate() {
+        if (this.IsValidToken(this.state.token)) {
+            this.ConfirmDeactivateUser(this.state.token);
+        } else {
+
+            if (!isMobile) {
+                toast.warn('Invalid token');
+                //history.push('/');
+            } else {
+                this.setState({ result: this.invalidDeactivationToken() });
+            }
+        }
+    }
+
+    IsValidToken = (token: string) => {
+        return /^[a-z0-9]{512}$/.test(token);
+    }
+
+    ClearAndRedirect = () => {
+        console.log('Clear and redirect')
+        localStorage.clear();
+
+        if (!isMobile) {
+            toast.info('Your account has been deactivated');
+            history.push('/');
+        } else {
+            this.setState({ result: this.confirmDeactivation() });
+        }
+    }
+
+    ConfirmDeactivateUser = (token: string) => {
+        axios.get('/api/confirmDeactivation/' + token).then(res => {
+            console.log('All is ok')
+            this.ClearAndRedirect()
+        }).catch(err => {
+            if (!isMobile) {
+                toast.warn('Invalid token');
+                history.push('/');
+            } else {
+                this.setState({ result: this.invalidDeactivationToken() });
+            }
+        });
+    }
+
+
+
     renderConfirmDeactivation(): JSX.Element {
-        return(
+        return (
             <div>
                 <p className="container-title">Deactivation Email</p>
                 <p className="privacy-disclaimer">Please check your email and follow the instructions to deactivate your account so you can start using Internxt again.</p>
                 <div className="privacy-remainders" style={{ paddingTop: '20px' }}>Once you deactivate your account, you will be able to sign up using the same email address. Please store your password somewhere safe. With Internxt, only you are the true owner of your data. With great power there must also come great responsibility.</div>
-                
+
                 <Button variant="dark" className="btn-block on" onClick={(e: any) => {
                     e.preventDefault();
                 }}>Re-send deactivation email</Button>
@@ -33,7 +90,7 @@ class Recovery extends React.Component<Props, State> {
     }
 
     renderRecoveryContainer(): JSX.Element {
-        return(
+        return (
             <div>
                 <p className="container-title">Internxt Security</p>
                 <p className="privacy-disclaimer">As specified during the sign up process, Internxt does not know your password, and thus, that way, only you can decrypt your account and its data. For that reason, if you forget your password, we can't restore your account. What we can do, however, is to <span style={{ fontWeight: 'bold' }}>delete your account and erase all its files</span>, so that you can sign up again. Please enter your email below so that we can process the account removal.</p>
@@ -43,14 +100,14 @@ class Recovery extends React.Component<Props, State> {
                 }}>
                     <Form.Row style={{ paddingTop: '5px' }}>
                         <Form.Group as={Col} controlId="email">
-                            <Form.Control placeholder="Email address" type="email" required autoComplete="off" onChange={() => {}} autoFocus />
+                            <Form.Control placeholder="Email address" type="email" required autoComplete="off" onChange={() => { }} autoFocus />
                         </Form.Group>
                     </Form.Row>
 
                     <Form.Row className="form-register-submit" style={{ marginTop: '15px' }}>
                         <Form.Group as={Col} style={{ paddingRight: 20 }}>
                             <Button className="btn-block off" onClick={(e: any) => {
-                                history.push('/signin');
+                                history.push('/login');
                                 e.preventDefault();
                             }}>Back</Button>
                         </Form.Group>
@@ -68,8 +125,18 @@ class Recovery extends React.Component<Props, State> {
         );
     }
 
+    confirmDeactivation() {
+        return <p>Your account has been deactivated</p>
+    }
+
+    invalidDeactivationToken() {
+        return <div>
+            <p>Invalid token</p>
+        </div>;
+    }
+
     render() {
-        return(
+        return (
             <div>
                 {this.state.container}
             </div>
@@ -77,4 +144,4 @@ class Recovery extends React.Component<Props, State> {
     }
 }
 
-export default Recovery;
+export default Deactivation;
