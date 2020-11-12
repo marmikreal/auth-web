@@ -2,17 +2,18 @@ import React from 'react';
 import { Switch, Route, Router, Redirect } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import events from './lib/pubsub';
+import Auth from './components/Auth';
+import SignIn from './components/signin/SignIn';
+import SignUp from './components/signup/SignUp';
+import Recovery from './components/recovery/Recovery';
 import history from './lib/history';
-import Auth from './components/auth/Auth';
-import SignIn from './components/auth/signin/SignIn';
-import SignUp from './components/auth/signup/SignUp';
-import Recovery from './components/auth/recovery/Recovery';
 import './App.scss';
 import 'bootstrap/dist/css/bootstrap.css';
 
 interface Props {};
 interface State {
   showRecoveryStep: string
+  isAuthenticated: Boolean
 };
 
 class App extends React.Component<Props, State> {
@@ -20,7 +21,8 @@ class App extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      showRecoveryStep: 'invisible'
+      showRecoveryStep: 'invisible',
+      isAuthenticated: false
     };
   }
 
@@ -40,18 +42,18 @@ class App extends React.Component<Props, State> {
             
             <Router history={history}>
               <Switch>    
-                  <Route exact path='/signin' render={props =>
-                    <Auth internalForm={<SignIn />}
+                  <Route exact path='/login' render={props =>
+                    <Auth internalForm={<SignIn isAuthenticated={this.state.isAuthenticated} />}
                   />} />
-
-                  <Route exact path='/signup' render={props =>
+                  
+                  <Route exact path='/new' render={props =>
                     <Auth internalForm={<SignUp />}
                   />} />
 
                   <Route exact path='/recovery' render={props => <Recovery />} />
 
-                  <Route exact path='/'><Redirect to='/signin' /></Route>
-                  <Route path="*"><Redirect to='/signin' /></Route>
+                  <Route exact path='/'><Redirect to='/login' /></Route>
+                  <Route path="*"><Redirect to='/login' /></Route>
                   
               </Switch>
             </Router>
@@ -67,5 +69,6 @@ class App extends React.Component<Props, State> {
     );
   }
 }
+
 
 export default App;

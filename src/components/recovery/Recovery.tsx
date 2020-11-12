@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Form, Col, Button } from 'react-bootstrap';
-import history from '../../../lib/history';
+import history from '../../lib/history';
 import './Recovery.scss';
 
 interface Props {}

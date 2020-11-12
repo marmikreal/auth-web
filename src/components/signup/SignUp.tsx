@@ -1,42 +1,171 @@
-import React from 'react';
+import * as React from 'react';
 import { Form, Col, Button, Image } from 'react-bootstrap';
-import history from './../../../lib/history';
-import './SignUp.scss';
-import logo from './../../../assets/img/inxt-logo-black.svg';
+import { isMobile, isAndroid, isIOS } from 'react-device-detect';
+import 'react-toastify/dist/ReactToastify.css';
 
-interface Props {}
+import './SignUp.scss';
+import history from '../../lib/history';
+import logo from '../../assets/img/inxt-logo-black.svg';
+import { getHeaders } from '../../lib/auth';
+import { encryptText, encryptTextWithKey, passToHash } from '../../lib/utils';
+
+const bip39 = require('bip39');
+
+interface Props {
+    match?: any
+}
+
 interface State {
-    firstName: string,
-    lastName: string,
-    email: string
+    isAuthenticated?: Boolean
+    register: any
     container: JSX.Element
-    isValid: Boolean
+    validated?: Boolean
+    showModal: Boolean
+    token?: string
+    user?: any
 }
 
 class SignUp extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        let isEmailParam = this.props.match && this.isValidEmail(this.props.match.params.email);
+
         this.state = {
-            firstName: '',
-            lastName: '',
-            email: '',
-            container: this.renderSignUpContainer(),
-            isValid: false
+            container: isEmailParam ? this.renderConfirmActivationContainer() : this.renderSignUpContainer(),
+            register: {
+                name: '',
+                lastname: '',
+                email: '',
+                password: '',
+                confirmPassword: ''
+            },
+            showModal: false
         };
     }
 
-    handleFirstNameChange(e: any) {
-        this.setState({ firstName: e.target.value });
+    componentDidMount() {
+        if (isMobile) {
+            if (isAndroid) {
+                window.location.href = "https://play.google.com/store/apps/details?id=com.internxt.cloud";
+            } else if (isIOS) {
+                window.location.href = "https://itunes.apple.com/us/app/x-cloud-secure-file-storage/id1465869889";
+            }
+        }
+
+        const xUser = JSON.parse(localStorage.getItem('xUser') || '{}');
+        const xToken = localStorage.getItem('xToken');
+        const mnemonic = localStorage.getItem('xMnemonic');
+        const haveInfo = (xUser && xToken && mnemonic);
+
+        if (this.state.isAuthenticated === true || haveInfo) {
+            // TODO: Redirect to the referer application
+        }
     }
 
-    handleLastNameChange(e: any) {
-        this.setState({ lastName: e.target.value });
+    
+
+    handleChangeRegister = (event: any) => {
+        var registerState = this.state.register;
+        registerState[event.target.id] = event.target.value;
+        this.setState({ register: registerState });
     }
 
-    handleEmailChange(e: any) {
-        this.setState({ email: e.target.value });
+    readReferalCookie() {
+        const cookie = document.cookie.match(/(^| )REFERRAL=([^;]+)/);
+        return cookie ? cookie[2] : null;
     }
+
+    isValidEmail(email: string) {
+        let emailPattern = /^((?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*"))@((?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]))$/;
+        return emailPattern.test(email.toLowerCase());
+    }
+    
+    
+    isValidPassword(password: string) {
+        let passwordPattern = /^[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+        return passwordPattern.test(password);
+    }
+
+    validateRegisterForm = () => {
+        let isValid = true;
+
+        if (!this.state.register.name || !this.state.register.lastname || !this.state.register.email) {
+            return false;
+        }
+
+        // Name lenght check
+        if (this.state.register.name.length < 1 && this.state.register.lastname.length < 1) isValid = false;
+        // Email length check and validation
+        if (this.state.register.email.length < 5 || !this.isValidEmail(this.state.register.email)) isValid = false;
+
+        return isValid;
+
+    }
+
+    doRegister = () => {
+        // Setup hash and salt 
+        const hashObj = passToHash({ password: this.state.register.password });
+        const encPass = encryptText(hashObj.hash);
+        const encSalt = encryptText(hashObj.salt);
+        // Setup mnemonic
+        const mnemonic = bip39.generateMnemonic(256);
+        const encMnemonic = encryptTextWithKey(mnemonic, this.state.register.password);
+
+        fetch("/api/register", {
+            method: "post",
+            headers: getHeaders(true, true),
+            body: JSON.stringify({
+                name: this.state.register.name,
+                lastname: this.state.register.lastname,
+                email: this.state.register.email,
+                password: encPass,
+                mnemonic: encMnemonic,
+                salt: encSalt,
+                referral: this.readReferalCookie()
+            })
+        }).then(response => {/*   
+            ******************************************
+            FLOW WILL BE REDIRECTED TO THE REFERER APP
+            ******************************************
+            if (response.status === 200) {
+                response.json().then((body) => {
+                    // Manage succesfull register
+                    const { token, user } = body;
+                    localStorage.setItem('xToken', token);
+
+                    // Clear form fields
+                    this.setState({
+                        register: {
+                            name: '',
+                            lastname: '',
+                            email: this.state.register.email,
+                            password: '',
+                            confirmPassword: '',
+                        },
+                        validated: false,
+                        showModal: true,
+                        token,
+                        user,
+                        container: this.renderConfirmActivationContainer()
+                    });
+                });
+            } else {
+                response.json().then((body) => {
+                    // Manage account already exists (error 400)
+                    const { message } = body;
+                    toast.warn(`"${message}"`);
+                    this.setState({ validated: false });
+                })
+            }*/
+        }).catch(err => {
+            console.error("Register error", err);
+        });
+
+    }
+
+
+
 
     renderHeaderButtons(): JSX.Element {
         return(
@@ -51,12 +180,12 @@ class SignUp extends React.Component<Props, State> {
                 <div className="menu-box">
                     <Button variant="dark" className='off __signin-btn' onClick={(e: any) => {
                         e.preventDefault();
-                        history.push('/signin');
+                        history.push('/login');
                     }}>Sign in</Button>
 
                     <Button variant="dark" className='on __signup-btn' onClick={(e: any) => {
                         e.preventDefault();
-                        history.push('/signup');
+                        history.push('/new');
                     }}>Create account</Button>
                 </div>
             </div>
@@ -154,21 +283,8 @@ class SignUp extends React.Component<Props, State> {
         );
     }
 
-    isValidForm(): Boolean {
-        let isValid = true;
-        console.log('validating...');
-
-        if (!this.state) return false;
-
-        if (this.state.firstName === '' || this.state.lastName === '') {
-            isValid = false;
-        }
-
-        return isValid;
-    }
-
     renderSignUpContainer(): JSX.Element {
-        const isValid = this.isValidForm();
+        //const isValid = this.validateRegisterForm();
         return(
             <div>
                 {this.renderHeaderButtons()}
@@ -182,15 +298,15 @@ class SignUp extends React.Component<Props, State> {
                 }}>
                     <Form.Row>
                         <Form.Group as={Col} controlId="firstName">
-                            <Form.Control placeholder="First name" required autoComplete="firstname" value={this.state && this.state.firstName} onChange={this.handleFirstNameChange.bind(this)} autoFocus />
+                            <Form.Control placeholder="First name" required autoComplete="firstname" value={this.state && this.state.register.firstName} onChange={this.handleChangeRegister.bind(this)} autoFocus />
                         </Form.Group>
                         <Form.Group as={Col} controlId="lastName">
-                            <Form.Control placeholder="Last name" required autoComplete="lastname" value={this.state && this.state.lastName} onChange={this.handleLastNameChange.bind(this)} />
+                            <Form.Control placeholder="Last name" required autoComplete="lastname" value={this.state && this.state.register.lastName} onChange={this.handleChangeRegister.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="email">
-                            <Form.Control placeholder="Email address" type="email" required autoComplete="email" value={this.state && this.state.email} onChange={this.handleEmailChange.bind(this)} />
+                            <Form.Control placeholder="Email address" type="email" required autoComplete="email" value={this.state && this.state.register.email} onChange={this.handleChangeRegister.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row className="form-register-submit">
