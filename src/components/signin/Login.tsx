@@ -140,7 +140,7 @@ class Login extends React.Component<LoginProps, LoginState> {
     }
 
     check2FANeeded = () => {
-        fetch('/api/login', {
+        fetch('/login', {
           method: 'POST',
           headers: getHeaders(true, true),
           body: JSON.stringify({ email: this.state.email })
@@ -184,7 +184,7 @@ class Login extends React.Component<LoginProps, LoginState> {
       */
 
       // Proceed with submit
-      fetch("/api/login", {
+      fetch("/login", {
         method: "post",
         headers: getHeaders(true, false),
         body: JSON.stringify({ email: this.state.email })
@@ -197,7 +197,7 @@ class Login extends React.Component<LoginProps, LoginState> {
             const hashObj = passToHash({ password: this.state.password, salt });
             const encPass = encryptText(hashObj.hash);
     
-            fetch("/api/access", {
+            fetch("/access", {
               method: "post",
               headers: getHeaders(true, false),
               body: JSON.stringify({
@@ -262,6 +262,7 @@ class Login extends React.Component<LoginProps, LoginState> {
                   event: 'user-signup',
                   email: data.user.email
                 })*/
+                console.log("LOGGED IN")
               }).catch(err => {
                 toast.warn(`"${err.error ? err.error : err}"`);
               });
@@ -323,7 +324,8 @@ class Login extends React.Component<LoginProps, LoginState> {
 
                     <Form.Row className="form-register-submit">
                         <Form.Group as={Col}>
-                            <Button variant="dark" className="on btn-block" disabled={!this.isValidForm()} type="submit">Sign in</Button>
+                            <Button variant="dark" className="on btn-block" disabled={!this.isValidForm()} type="submit" onClick={() => {
+                                this.doLogin();}} >Sign In</Button>
                         </Form.Group>
                     </Form.Row>
                 </Form>

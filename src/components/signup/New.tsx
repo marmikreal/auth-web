@@ -9,6 +9,7 @@ import history from '../../lib/history';
 import logo from '../../assets/img/inxt-logo-black.svg';
 import { getHeaders } from '../../lib/auth';
 import { encryptText, encryptTextWithKey, passToHash } from '../../lib/utils';
+import AesUtil from '../../lib/AesUtil';
 
 const bip39 = require('bip39');
 
@@ -126,8 +127,8 @@ class New extends React.Component<Props, State> {
         const decpublicKey = Buffer.from(codpublicKey).toString();
         const codrevocateKey = Buffer.from(revocationCertificate).toString('base64');
         */
-
-        fetch("/api/register", {
+      
+        fetch("/register", {
             method: "post",
             headers: getHeaders(true, true),
             body: JSON.stringify({
@@ -257,12 +258,12 @@ class New extends React.Component<Props, State> {
                     <Form.Row>
                         <Form.Control type="hidden" name="username" autoComplete="username" value={''} />
                         <Form.Group as={Col} controlId="password">
-                            <Form.Control type="password" required placeholder="Password" autoComplete="new-password" onChange={() => { }} autoFocus />
+                            <Form.Control type="password" required placeholder="Password" autoComplete="new-password" onChange={this.handleChangeRegister.bind(this)} autoFocus />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group as={Col} controlId="confirmPassword">
-                            <Form.Control type="password" required placeholder="Confirm password" autoComplete="confirm-password" onChange={() => { }} />
+                            <Form.Control type="password" required placeholder="Confirm password" autoComplete="confirm-password" onChange={this.handleChangeRegister.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row className="form-register-submit">
@@ -276,6 +277,7 @@ class New extends React.Component<Props, State> {
                         </Form.Group>
                         <Form.Group as={Col}>
                             <Button variant="dark" className="btn-block on" type="submit" onClick={() => {
+                                this.doRegister();
                                 this.setState({
                                     container: this.renderConfirmActivationContainer()
                                 });
@@ -315,11 +317,11 @@ class New extends React.Component<Props, State> {
                     });
                 }}>
                     <Form.Row>
-                        <Form.Group as={Col} controlId="firstName">
-                            <Form.Control placeholder="First name" required autoComplete="firstname" value={this.state && this.state.register.firstName} onChange={this.handleChangeRegister.bind(this)} autoFocus />
+                        <Form.Group as={Col} controlId="name">
+                            <Form.Control placeholder="First name" required autoComplete="firstname" value={this.state && this.state.register.name} onChange={this.handleChangeRegister.bind(this)} autoFocus />
                         </Form.Group>
-                        <Form.Group as={Col} controlId="lastName">
-                            <Form.Control placeholder="Last name" required autoComplete="lastname" value={this.state && this.state.register.lastName} onChange={this.handleChangeRegister.bind(this)} />
+                        <Form.Group as={Col} controlId="lastname">
+                            <Form.Control placeholder="Last name" required autoComplete="lastname" value={this.state && this.state.register.lastname} onChange={this.handleChangeRegister.bind(this)} />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
