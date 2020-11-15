@@ -11,6 +11,7 @@ interface Props {
 }
 interface State {
     container: JSX.Element
+    email: string
     token: string
     result: JSX.Element
     errorReason: string
@@ -22,6 +23,7 @@ class Deactivation extends React.Component<Props, State> {
 
         this.state = {
             container: this.renderRecoveryContainer(),
+            email: '',
             token: this.props.match.params.token,
             result: this.renderConfirmDeactivation(),
             errorReason: ''
@@ -42,6 +44,12 @@ class Deactivation extends React.Component<Props, State> {
         }
     }
 
+    handleChangeEmail = (event: any) => {
+        this.setState({
+          email: event.target.value,
+        });
+    }
+
     IsValidToken = (token: string) => {
         return /^[a-z0-9]{512}$/.test(token);
     }
@@ -60,7 +68,7 @@ class Deactivation extends React.Component<Props, State> {
 
     ConfirmDeactivateUser = (token: string) => {
         axios.get('/api/confirmDeactivation/' + token).then(res => {
-            console.log('All is ok')
+            console.log('All is ok') //debug
             this.ClearAndRedirect()
         }).catch(err => {
             if (!isMobile) {
@@ -100,7 +108,7 @@ class Deactivation extends React.Component<Props, State> {
                 }}>
                     <Form.Row style={{ paddingTop: '5px' }}>
                         <Form.Group as={Col} controlId="email">
-                            <Form.Control placeholder="Email address" type="email" required autoComplete="off" onChange={() => { }} autoFocus />
+                            <Form.Control placeholder="Email address" type="email" required autoComplete="off" onChange={this.handleChangeEmail.bind(this)} autoFocus />
                         </Form.Group>
                     </Form.Row>
 
