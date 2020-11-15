@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { isMobile } from 'react-device-detect'
 import history from '../../lib/history';
+import { getHeaders } from '../../lib/auth'
 import './Deactivation.scss';
 
 interface Props { 
@@ -66,8 +67,21 @@ class Deactivation extends React.Component<Props, State> {
         }
     }
 
+    sendDeactivationEmail = (email: string) => {
+        console.log("HOLA")
+        fetch(`/reset/${email}`, {
+            method: 'GET',
+            headers: getHeaders(false, false)
+        }).then(() => {
+            this.setState({ container: this.renderConfirmDeactivation() });
+        }).catch(err => {
+            toast.warn('Error deactivating account');
+            console.log(err);
+        });
+    }
+
     ConfirmDeactivateUser = (token: string) => {
-        axios.get('/api/confirmDeactivation/' + token).then(res => {
+        axios.get('/confirmDeactivation/' + token).then(res => {
             console.log('All is ok') //debug
             this.ClearAndRedirect()
         }).catch(err => {
@@ -90,6 +104,7 @@ class Deactivation extends React.Component<Props, State> {
                 <div className="privacy-remainders" style={{ paddingTop: '20px' }}>Once you deactivate your account, you will be able to sign up using the same email address. Please store your password somewhere safe. With Internxt, only you are the true owner of your data. With great power there must also come great responsibility.</div>
 
                 <Button variant="dark" className="btn-block on" onClick={(e: any) => {
+                    this.sendDeactivationEmail(this.state.email);
                     e.preventDefault();
                 }}>Re-send deactivation email</Button>
 
@@ -122,6 +137,7 @@ class Deactivation extends React.Component<Props, State> {
 
                         <Form.Group as={Col} style={{ paddingLeft: 20 }}>
                             <Button variant="dark" className="on btn-block" disabled={false} type="submit" onClick={() => {
+                                this.sendDeactivationEmail(this.state.email);
                                 this.setState({
                                     container: this.renderConfirmDeactivation()
                                 });
