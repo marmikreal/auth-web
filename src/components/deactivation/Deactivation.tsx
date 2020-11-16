@@ -68,8 +68,20 @@ class Deactivation extends React.Component<Props, State> {
     }
 
     sendDeactivationEmail = (email: string) => {
-        console.log("HOLA")
         fetch(`/reset/${email}`, {
+            method: 'GET',
+            headers: getHeaders(false, false)
+        }).then(() => {
+            this.setState({ container: this.renderConfirmDeactivation() });
+        }).catch(err => {
+            toast.warn('Error deactivating account');
+            console.log(err);
+        });
+    }
+
+    resendDeactivationEmail = (email: string) => {
+        console.log("HOLA")
+        fetch(`/resend/${email}`, {
             method: 'GET',
             headers: getHeaders(false, false)
         }).then(() => {
@@ -104,7 +116,7 @@ class Deactivation extends React.Component<Props, State> {
                 <div className="privacy-remainders" style={{ paddingTop: '20px' }}>Once you deactivate your account, you will be able to sign up using the same email address. Please store your password somewhere safe. With Internxt, only you are the true owner of your data. With great power there must also come great responsibility.</div>
 
                 <Button variant="dark" className="btn-block on" onClick={(e: any) => {
-                    this.sendDeactivationEmail(this.state.email);
+                    this.resendDeactivationEmail(this.state.email);
                     e.preventDefault();
                 }}>Re-send deactivation email</Button>
 
